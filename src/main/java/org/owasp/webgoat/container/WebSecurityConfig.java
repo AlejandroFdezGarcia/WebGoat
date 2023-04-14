@@ -92,4 +92,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   public UserDetailsService userDetailsServiceBean() throws Exception {
     return userDetailsService;
- 
+  }
