@@ -42,14 +42,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /** Security configuration for WebGoat. */
 @Configuration
 @AllArgsConstructor
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
   private final UserService userDetailsService;
 
   @Override
@@ -78,31 +78,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .permitAll();
     security.and().logout().deleteCookies("JSESSIONID").invalidateHttpSession(true);
     security.and().csrf().disable();
-
     http.headers().cacheControl().disable();
     http.exceptionHandling().authenticationEntryPoint(new AjaxAuthenticationEntryPoint("/login"));
   }
 
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetailsService);
+    auth.userDetailsService(userDetailsService)
+        .passwordEncoder(passwordEncoder());
   }
 
   @Bean
   @Override
   public UserDetailsService userDetailsServiceBean() throws Exception {
     return userDetailsService;
-  }
-
-  @Override
-  @Bean
-  protected AuthenticationManager authenticationManager() throws Exception {
-    return super.authenticationManager();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Bean
-  public NoOpPasswordEncoder passwordEncoder() {
-    return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
-  }
-}
+ 
